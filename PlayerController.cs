@@ -1,11 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using FishNet.Connection;
-using FishNet.Object;
-using System.Globalization;
 
-public class PlayerController : NetworkBehaviour
+public class PlayerController : MonoBehaviour
 {
     [Header("Base setup")]
     public float walkingSpeed = 7.5f;
@@ -20,7 +17,6 @@ public class PlayerController : NetworkBehaviour
     private float currentTiltAngleX = 0f;
     private float currentTiltAngleZ = 0f;
 
- 
     public float normalFoV = 60f;
     public float runningFoV = 75f;
     public float fovLerpSpeed = 5f;
@@ -40,11 +36,12 @@ public class PlayerController : NetworkBehaviour
 
     public bool StopPlayer = false;
 
-    public override void OnStartClient()
+    void Start()
     {
-        base.OnStartClient();
+        characterController = GetComponent<CharacterController>();
 
-        if (base.IsOwner)
+        // Kamera ve mouse ayarlarý
+        if (playerCamera != null)
         {
             playerCamera.enabled = true;
             playerCamera.fieldOfView = normalFoV;
@@ -52,21 +49,11 @@ public class PlayerController : NetworkBehaviour
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
         }
-        else
-        {
-            playerCamera.enabled = false;
-            gameObject.GetComponent<PlayerController>().enabled = false;
-        }
-    }
-
-    void Start()
-    {
-        characterController = GetComponent<CharacterController>();
     }
 
     void Update()
     {
-        if (!IsOwner || StopPlayer) { return; }
+        if (StopPlayer) return;
 
         bool isRunning = Input.GetKey(KeyCode.LeftShift) && (Input.GetAxis("Vertical") != 0 || Input.GetAxis("Horizontal") != 0);
 
